@@ -1,0 +1,158 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Objectif index{% endblock %}
+
+{% block body %}
+    <style>
+        .objectif-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        
+        .objectif-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-img-container {
+            height: 180px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .objectif-card-img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+        
+        .card-text {
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            min-height: 60px;
+        }
+        
+        .badge-custom {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 5px;
+        }
+        
+        .btn-card {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-card i {
+            margin-right: 5px;
+        }
+        
+        .no-objectifs {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            color: #343a40;
+        }
+    </style>
+
+    <div class="container py-5">
+        <div class="page-header">
+            <h1 class="page-title">Les Formes Physiques</h1>
+        
+        </div>
+
+        {% if objectifs|length > 0 %}
+            <div class="row">
+                {% for objectif in objectifs %}
+                    <div class="col-md-4 col-lg-3 mb-4">
+                        <div class="card objectif-card">
+                            <div class="card-img-container">
+                                {% if objectif.image %}
+                                    <img src="{{ asset(objectif.image) }}" class="objectif-card-img" alt="{{ objectif.nom }}">
+                                {% else %}
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ objectif.nom }}</h5>
+                                <p class="card-text">
+                                    {% if objectif.description|length > 80 %}
+                                        {{ objectif.description|slice(0, 80) }}...
+                                    {% else %}
+                                        {{ objectif.description }}
+                                    {% endif %}
+                                </p>
+                                
+                                <div class="mb-2">
+                                    <span class="badge bg-info badge-custom">Niveau: {{ objectif.niveau }}</span>
+                                    <span class="badge bg-secondary badge-custom">Semaine: {{ objectif.semaine }}</span>
+                                </div>
+                                
+                                <div class="action-buttons">
+                                  
+                                  
+                                    <a href="{{ path('app_plan_by_objectif1', {'id': objectif.id}) }}" class="btn btn-warning btn-card" title="Plans">
+                                        <i class="fas fa-file-alt"></i> Plans
+                                    </a>
+                                    {% if objectif.lien %}
+                                    <a href="{{ objectif.lien }}" target="_blank" class="btn btn-outline-primary btn-card" title="Lien">
+                                        <i class="fas fa-link"></i> Lien
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-objectifs">
+                <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                <p>Aucun objectif enregistré</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
