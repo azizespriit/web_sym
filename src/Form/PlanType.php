@@ -9,25 +9,27 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Entity\Jour;
+use App\Repository\JourRepository;
+use App\Repository\ObjectifRepository;
 
 class PlanType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('Jour', ChoiceType::class, [
+        ->add('Jour', EntityType::class, [
+            'class' => Jour::class,
+            'choice_label' => 'nom',
             'label' => 'Jour de la semaine',
-            'choices' => [
-                'Lundi' => 'Lundi',
-                'Mardi' => 'Mardi',
-                'Mercredi' => 'Mercredi',
-                'Jeudi' => 'Jeudi',
-                'Vendredi' => 'Vendredi',
-                'Samedi' => 'Samedi',
-                'Dimanche' => 'Dimanche',
-            ],
             'placeholder' => 'Choisissez un jour',
             'attr' => ['class' => 'form-control'],
+            'query_builder' => function (JourRepository $repo) use ($options) {
+                return $repo->createQueryBuilder('j')
+                    ->where('j.objectif = :objectif')
+                    ->setParameter('objectif', $options['objectif'])
+                    ->orderBy('j.nom', 'ASC');
+            },
         ])
             ->add('Nutration', TextType::class, [
                 'label' => 'Plan nutritionnel',
@@ -41,16 +43,13 @@ class PlanType extends AbstractType
                 'label' => 'Distance de course (km)',
                 'attr' => ['class' => 'form-control', 'step' => '0.1']
             ]);
-            
-     
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Plan::class,
-            'hide_objectif_field' => false // Option personnalisée
+            'objectif' => null, // Définir l'option objectif comme nullable
         ]);
     }
 }
-?>

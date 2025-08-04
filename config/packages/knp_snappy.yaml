@@ -1,0 +1,5 @@
+knp_snappy:
+    pdf:
+        enabled: true
+        binary: '%env(WKHTMLTOPDF_PATH)%'
+    temporary_folder: '%kernel.project_dir%/var/tmp'

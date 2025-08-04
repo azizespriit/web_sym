@@ -23,47 +23,80 @@
 
                     <div class="mb-4">
                         {{ form_label(form.nom, "Nom de l'objectif", {'label_attr': {'class': 'form-label fw-bold', 'style': 'font-size: 1.1rem;'}}) }}
-                        {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg py-3', 'placeholder': 'Ex: Maîtrise du marketing digital'}}) }}
+                        {{ form_widget(form.nom, {
+                            'attr': {
+                                'class': 'form-control form-control-lg py-3',
+                                'placeholder': 'Ex: Maîtrise du marketing digital',
+                                'required': true,
+                                'pattern': '^[a-zA-Z\\s]+$',
+                                'title': 'Le nom doit contenir uniquement des lettres et des espaces.'
+                            }
+                        }) }}
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6">
                             {{ form_label(form.niveau, 'Niveau de difficulté', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(form.niveau, {'attr': {'class': 'form-select py-3'}}) }}
+                            {{ form_widget(form.niveau, {
+                                'attr': {
+                                    'class': 'form-select py-3',
+                                    'required': true,
+                                    'min': 1,
+                                    'title': 'Le niveau doit être un nombre entier.'
+                                }
+                            }) }}
                         </div>
                         <div class="col-md-6">
                             {{ form_label(form.semaine, 'Semaine cible', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(form.semaine, {'attr': {'class': 'form-control py-3'}}) }}
+                            {{ form_widget(form.semaine, {
+                                'attr': {
+                                    'class': 'form-control py-3',
+                                    'required': true,
+                                    'min': 1,
+                                    'max': 52,
+                                    'title': 'La semaine doit être entre 1 et 52.'
+                                }
+                            }) }}
                         </div>
                     </div>
 
                     <div class="mb-4">
                         {{ form_label(form.description, 'Description détaillée', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'style': 'font-size: 1.1rem;'}}) }}
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 5,
+                                'style': 'font-size: 1.1rem;',
+                                'required': true,
+                                'title': 'La description est obligatoire.'
+                            }
+                        }) }}
                     </div>
 
-                 <div class="mb-4">
-    {{ form_label(form.image, 'Image illustrative', {
-        'label_attr': {'class': 'form-label fw-bold'}
-    }) }}
-    
-    {{ form_widget(form.image, {
-        'attr': {
-            'class': 'form-control'
-        }
-    }) }}
-    
-    <small class="text-muted">Formats acceptés : JPG, PNG | Taille max : 2MB</small>
-</div>
-
-
-  
-                        
+                    <div class="mb-4">
+                        {{ form_label(form.image, 'Image illustrative', {
+                            'label_attr': {'class': 'form-label fw-bold'}
+                        }) }}
+                        {{ form_widget(form.image, {
+                            'attr': {
+                                'class': 'form-control',
+                                'accept': 'image/jpeg,image/png'
+                            }
+                        }) }}
+                        <small class="text-muted">Formats acceptés : JPG, PNG | Taille max : 2MB</small>
                     </div>
 
                     <div class="mb-4">
                         {{ form_label(form.lien, 'Lien ressource', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                        {{ form_widget(form.lien, {'attr': {'class': 'form-control py-3', 'placeholder': 'https://exemple.com/ressource'}}) }}
+                        {{ form_widget(form.lien, {
+                            'attr': {
+                                'class': 'form-control py-3',
+                                'placeholder': 'https://exemple.com/ressource',
+                                'required': true,
+                                'pattern': '^https?://.+',
+                                'title': 'Veuillez entrer un lien valide commençant par http:// ou https://.'
+                            }
+                        }) }}
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
@@ -77,58 +110,5 @@
             </div>
         </div>
     </div>
-    </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const fileInput = document.getElementById('customImageInput');
-        const fileNameDisplay = document.getElementById('imageFileName');
-        const browseBtn = document.getElementById('browseButton');
-
-        if (fileInput && fileNameDisplay && browseBtn) {
-            browseBtn.addEventListener('click', () => fileInput.click());
-
-            fileInput.addEventListener('change', () => {
-                fileNameDisplay.value = fileInput.files[0]?.name || 'Aucun fichier sélectionné';
-            });
-        }
-    });
-</script>
-<script>
-    document.getElementById('browseButton').addEventListener('click', function () {
-        document.getElementById('customImageInput').click();
-    });
-</script>
-
-
-<style>
-    .form-control, .form-select {
-        font-size: 1.1rem;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #7f858f;
-        box-shadow: 0 0 0 0.25rem rgba(69, 70, 72, 0.25);
-    }
-    .card {
-        border-radius: 1rem;
-    }
-    .btn-lg {
-        font-size: 1.1rem;
-    }
-    .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
-        transition: all 0.3s;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-    .input-group {
-        margin-bottom: 0.5rem;  
-    }
-</style>
 {% endblock %}

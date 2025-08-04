@@ -35,7 +35,7 @@ class Plan
     /**
      * @var Collection<int, Objectif>
      */
-    #[ORM\OneToMany(targetEntity: Objectif::class, mappedBy: 'plan')]
+    #[ORM\OneToMany(targetEntity: Objectif::class, mappedBy: 'plan', cascade: ['persist', 'remove'])]
     private Collection $Plan;
 
     #[ORM\ManyToOne]

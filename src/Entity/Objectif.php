@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\ObjectifRepository;
+use App\Rating\Entity\Rating;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -46,22 +49,28 @@ class Objectif
     private ?int $semaine = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(message: "Le lien ne peut pas être vide.")]
-    private ?string $lien = null; 
+    #[Assert\Url(message: "Le lien doit être une URL valide.")]
+    private ?string $lien = null;
 
- 
+    #[ORM\OneToMany(targetEntity: Rating::class, mappedBy: 'objectif')]
+    private Collection $ratings;
 
-    public function __construct(?string $nom = null, ?string $image = null, ?string $description = null, ?int $niveau = null, ?int $semaine = null, ?string $lien = null)
-    {
-     
+    public function __construct(
+        ?string $nom = null,
+        ?string $image = null,
+        ?string $description = null,
+        ?int $niveau = null,
+        ?int $semaine = null,
+        ?string $lien = null
+    ) {
         $this->nom = $nom;
         $this->image = $image;
         $this->description = $description;
         $this->niveau = $niveau;
         $this->semaine = $semaine;
         $this->lien = $lien;
+        $this->ratings = new ArrayCollection();
     }
-    
 
     public function getId(): ?int
     {
@@ -76,6 +85,17 @@ class Objectif
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
         return $this;
     }
 
@@ -100,16 +120,6 @@ class Objectif
         $this->niveau = $niveau;
         return $this;
     }
-    public function getImage(): ?string
-{
-    return $this->image;
-}
-public function setImage(?string $image): self
-{
-    $this->image = $image;
-    return $this;
-}
-
 
     public function getSemaine(): ?int
     {
@@ -133,7 +143,52 @@ public function setImage(?string $image): self
         return $this;
     }
 
-   
+    /**
+     * @return Collection<int, Rating>
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
 
-  
+    public function addRating(Rating $rating): self
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setObjectif($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): self
+    {
+        if ($this->ratings->removeElement($rating)) {
+            // set the owning side to null (unless already changed)
+            if ($rating->getObjectif() === $this) {
+                $rating->setObjectif(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAverageRating(): float
+    {
+        if ($this->ratings->isEmpty()) {
+            return 0;
+        }
+
+        $total = 0;
+        foreach ($this->ratings as $rating) {
+            $total += $rating->getScore();
+        }
+
+        return round($total / $this->ratings->count(), 1);
+    }
+
+    public function getRatingCount(): int
+    {
+        return $this->ratings->count();
+    }
 }

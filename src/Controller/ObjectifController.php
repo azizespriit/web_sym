@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Objectif;
+use App\Entity\Jour;
 use App\Form\ObjectifType;
 use App\Repository\ObjectifRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,34 +26,44 @@ final class ObjectifController extends AbstractController{
 
 
     #[Route('/new', name: 'app_objectif_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {    
-        $objectif = new Objectif();
-        $form = $this->createForm(ObjectifType::class, $objectif);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
-           
-            $file = $form->get('image')->getData();
-    
-            if ($file) {
-                $filename = uniqid() . '.' . $file->guessExtension();
-                $file->move($this->getParameter('images_directory'), $filename);
+public function new(Request $request, EntityManagerInterface $entityManager): Response
+{    
+    $objectif = new Objectif();
+    $form = $this->createForm(ObjectifType::class, $objectif);
+    $form->handleRequest($request);
 
-                $objectif->setImage($filename);
-            }
-    
-           
-            $entityManager->persist($objectif);
-            $entityManager->flush();
-            return $this->redirectToRoute('app_objectif_index', [], Response::HTTP_SEE_OTHER);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $file = $form->get('image')->getData();
+
+        if ($file) {
+            $filename = uniqid() . '.' . $file->guessExtension();
+            $file->move($this->getParameter('images_directory'), $filename);
+            $objectif->setImage($filename);
         }
 
-        return $this->render('objectif/back/new.html.twig', [
-            'objectif' => $objectif,
-            'form' => $form,
-        ]);
+        $entityManager->persist($objectif);
+        $entityManager->flush(); // flush d'abord pour avoir l'id de l'objectif
+
+        // Créer les 7 jours et les lier à l'objectif
+        $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        foreach ($jours as $nomJour) {
+            $jour = new Jour();
+            $jour->setNom($nomJour);
+            $jour->setObjectif($objectif); // association avec l'objectif
+            $entityManager->persist($jour);
+        }
+
+        $entityManager->flush(); // flush pour insérer les jours
+
+        return $this->redirectToRoute('app_objectif_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    return $this->render('objectif/back/new.html.twig', [
+        'objectif' => $objectif,
+        'form' => $form,
+    ]);
+}
+
 
 
     
